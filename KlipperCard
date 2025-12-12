@@ -1,0 +1,216 @@
+#Code for replicating a Bambulab-Integration-Style card for Klipper Printers. The foundation is created with some "help" of ChatGPTina.
+#The refinement is done with help of Reddit, trial and error, cursing, Github and more cursing. 
+#I can´t help if there are any issues as i´m no programer :) So you´re on your own. And Reddit. And an AI of your choice. 
+#The progressbar is not working. I didnt had the time toi check why. So if you have ideas I´m here for it. 
+
+
+type: custom:layout-card
+layout_type: grid
+layout:
+  grid-template-columns: 60% 20% 20%
+  grid-template-rows: auto
+  grid-gap: 4px
+  align-items: stretch
+cards:
+  - camera_view: auto
+    fit_mode: cover
+    type: picture-glance
+    title: K1 Max
+    entities:
+      - entity: camera.*yourcamera*
+    aspect_ratio: "1"
+    camera_image: camera.*yourcamera*
+  - type: vertical-stack
+    cards:
+      - type: custom:button-card
+        icon: mdi:lightbulb
+        entity: number.k1_max_output_pin_led
+        show_name: false
+        styles:
+          card:
+            - border-radius: 1rem
+            - height: 60px
+            - width: 90px
+            - justify-self: center
+          icon:
+            - height: 25px
+      - type: custom:button-card
+        icon: mdi:monitor-eye
+        show_name: false
+        tap_action:
+          action: toggle
+          entity: input_boolean.show_k1_max_livecam  #needs to be created
+        styles:
+          card:
+            - border-radius: 1rem
+            - height: 60px
+            - width: 90px
+            - justify-self: center
+          icon:
+            - height: 25px
+      - type: custom:button-card
+        icon: mdi:pause
+        entity: button.k1_max_pause_print
+        show_name: false
+        styles:
+          card:
+            - border-radius: 1rem
+            - height: 60px
+            - width: 90px
+            - justify-self: center
+          icon:
+            - height: 25px
+      - type: custom:button-card
+        icon: mdi:stop
+        entity: button.k1_max_cancel_print
+        show_name: false
+        styles:
+          card:
+            - border-radius: 1rem
+            - height: 60px
+            - width: 90px
+            - justify-self: center
+          icon:
+            - height: 25px
+  - type: vertical-stack
+    cards:
+      - type: custom:button-card
+        entity: number.k1_max_extruder_target
+        show_name: false
+        show_state: true
+        styles:
+          grid:
+            - grid-template-areas: "\"i s\" \"ist_temp ist_temp\""
+            - grid-template-rows: 1fr 1fr
+          state:
+            - font-size: 13px
+            - padding-right: 10px
+          icon:
+            - height: 20px
+            - left: 5px
+          card:
+            - border-radius: 1rem
+            - height: 60px
+            - width: 90px
+            - justify-self: start
+          custom_fields:
+            ist_temp:
+              - justify-self: start
+              - padding-left: 5px
+              - allign-self: center
+        custom_fields:
+          ist_temp: |
+            [[[
+              return `<span style="color: var(--text-color-sensor); font-size: 18px;">
+                ${Math.round(states["sensor.k1_max_extruder_temperature"].state)}°C
+              </span>`;
+            ]]]
+      - type: custom:button-card
+        entity: number.k1_max_bed_target
+        show_name: false
+        show_state: true
+        styles:
+          grid:
+            - grid-template-areas: "\"i s\" \"ist_temp ist_temp\""
+            - grid-template-rows: 1fr 1fr
+          state:
+            - font-size: 13px
+            - padding-right: 10px
+          icon:
+            - height: 20px
+            - left: 5px
+          card:
+            - border-radius: 1rem
+            - height: 60px
+            - width: 90px
+            - justify-self: start
+          custom_fields:
+            ist_temp:
+              - justify-self: start
+              - padding-left: 5px
+              - allign-self: center
+        custom_fields:
+          ist_temp: |
+            [[[
+              return `<span style="color: var(--text-color-sensor); font-size: 18px;">
+                ${Math.round(states["sensor.k1_max_bed_temperature"].state)}°C
+              </span>`;
+            ]]]
+      - type: custom:button-card
+        entity: number.k1_max_speed_factor
+        show_name: false
+        show_state: true
+        styles:
+          grid:
+            - grid-template-areas: "\"i\" 's'"
+            - grid-template-rows: null
+          card:
+            - border-radius: 1rem
+            - height: 60px
+            - width: 90px
+            - justify-self: center
+          icon:
+            - height: 22px
+            - padding-right: 60px
+            - padding-bottom: 8px
+          state:
+            - padding-right: 38px
+            - padding-bottom: 3px
+            - font-size: 18px
+  - type: vertical-stack
+    cards:
+      - type: custom:button-card
+        entity: sensor.k1_max_print_time_left
+        show_icon: false
+        show_name: false
+        show_state: true
+        styles:
+          state:
+            - justify-self: start
+            - text-align: left
+            - font-size: 13px
+          card:
+            - background: none
+            - box-shadow: none
+            - border: none
+            - height: 20px
+            - padding: 0px
+      - type: custom:button-card
+        styles:
+          card:
+            - border-radius: 999px
+            - padding: 0
+            - height: 6px
+            - background-color: "#444"
+            - overflow: visible
+          custom_fields:
+            bar:
+              - height: 6px
+              - width: |
+                  [[[ 
+                    let p = parseFloat(states['sensor.k1_max_progress'].state || '0');
+                    return p + '%'; 
+                  ]]]
+              - background-color: "#4caf50"
+              - transition: width 0.8s ease-in-out
+              - border-radius: 999px
+        custom_fields:
+          bar: |
+            [[[ return '&nbsp;' ]]]
+      - type: custom:button-card
+        name: >
+          [[[ return states['sensor.k1_max_current_layer'].state + '/' +
+          states['sensor.k1_max_total_layer'].state; ]]]
+        show_icon: false
+        show_state: false
+        styles:
+          name:
+            - justify-self: start
+            - text-align: left
+            - font-size: 13px
+          card:
+            - background: none
+            - box-shadow: none
+            - border: none
+            - height: 20px
+            - padding: 0px
